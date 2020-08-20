@@ -1,7 +1,6 @@
-
 This is a quick and small web app that I built for a coding test. 
 
-The only external dependency is boodtrap 4 which is included in package.json file
+TThere are two dependencies, bootstrap 4 and Ngrx which are included in the package.json file
 
 To run the app in your computer:
     1. Clone this repo to your local machine;
