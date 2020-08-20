@@ -1,6 +1,7 @@
-import { Component, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { WeatherService } from './weather.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
+import { Store, select } from '@ngrx/store';
 
 
 @Component({
@@ -8,7 +9,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit {
   title = 'weather-check';
   @ViewChild('city') city: ElementRef;
   tempsSubscription: Subscription;
@@ -21,12 +22,22 @@ export class AppComponent implements OnDestroy {
   minBtnClicked: boolean = false;
   medianBtnClicked: boolean = false;
 
-  constructor( private weatherService: WeatherService) {}
-  ngOnDestroy(): void {
-    throw new Error("Method not implemented.");
+  spinner: Observable<boolean>;
+  
+
+  constructor( 
+    private weatherService: WeatherService,
+    private store: Store<any>
+    ) {}
+
+    
+  ngOnInit(): void {
+    this.spinner = this.store.pipe(select(state => state.spinner.isOn));
   }
 
+
   process() {
+    this.store.dispatch({ type: 'startSpinner' });
     this.tempsSubscription = this.weatherService.fetchWeather(this.city.nativeElement.value).subscribe((res) => {
       const maxTemps: number[] = [];
       const minTemps: number[] = [];
@@ -46,6 +57,8 @@ export class AppComponent implements OnDestroy {
       // finding median temperate
       const mid = Math.floor(maxTemps.length/2), nums = [...maxTemps].sort((a, b) => a-b);
       this.medianTemp = maxTemps.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+
+      this.store.dispatch({ type: 'stopSpinner' })
     },
     (error) => {
       console.log('error!!!', error);

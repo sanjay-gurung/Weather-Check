@@ -16,13 +16,15 @@
         </div>
     </div> -->
     <div class="d-flex justify-content-center" style="margin-top: 40px">
-      <button type="button" class="btn btn-info" id="maxTemp" (click)="onMaxTemp()">Maximum Temperatur</button>
+      <button *ngIf="!(spinner | async)" type="button" class="btn btn-info" id="maxTemp" (click)="onMaxTemp()" >Maximum Temperatur</button>
       <button type="button" class="btn btn-info" id="minTemp" (click)="onMinTemp()">Minimum Temperature</button>
       <button type="button" class="btn btn-info" id="medianTemp" (click)="onMedianTemp()">Median Temperature</button>
     </div>  
+    <div *ngIf="spinner | async"><img src="/assets/45.gif" /></div>
     <div class="d-flex justify-content-center" style="margin-top: 30px">
         <input *ngIf="maxBtnClicked" type="text" id="valueMax" class="form-control"  value="{{maxTemp}}" style="width: 130px">
         <input *ngIf="minBtnClicked" type="text" id="valueMin" class="form-control" value="{{minTemp}}" style="width: 130px">
         <input *ngIf="medianBtnClicked" type="text" id="valueMedian" class="form-control" value="{{medianTemp}}" style="width: 130px">
     </div>
+
 </div>
