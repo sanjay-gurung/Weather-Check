@@ -1,14 +1,33 @@
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { WeatherService } from './weather.service';
+import { Observable } from 'rxjs';
+
 
 describe('AppComponent', () => {
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+  let service: WeatherService;
+  let mockBaseUri: any;
+  let mockApiKey: any;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [ AppComponent ],
+      providers: [ WeatherService ]
     }).compileComponents();
   }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    service = TestBed.get(WeatherService);
+    mockBaseUri = jasmine.createSpy('dummyWeatherBaseUri');
+    mockApiKey = jasmine.createSpy('dummyApiKey')
+    fixture.detectChanges();
+  }) 
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent);
@@ -22,10 +41,16 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('weather-check');
   });
 
-  it('should render title', () => {
+  it('should render text - Weather Check', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('weather-check app is running!');
+    expect(compiled.querySelector('h1').textContent).toContain('Weather Check');
   });
+
+  it('should call featchWeather method when process methos is called', () => {
+    spyOn(service, 'fetchWeather')
+    component.process();
+    expect(service.fetchWeather).toHaveBeenCalled();
+  })
 });

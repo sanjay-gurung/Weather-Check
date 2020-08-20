@@ -1,6 +1,23 @@
-# WeatherCheck
 
+This is a quick and small web app that I built for a coding test. 
+
+The only external dependency is boodtrap 4 which is included in package.json file
+
+To run the app in your computer:
+    1. Clone this repo to your local machine;
+        eg: run command ->  npm clone https://github.com/sanjay-gurung/Weather-Check.git
+    2. After download is complete, open your code editor and run the command to install dependencies ->  npm i 
+    3. After package installation is complete, run the project using command ->  ng serve
+    4. for running test, run the command ng test
+
+
+
+
+
+
+# WeatherCheck
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.3.
+
 
 ## Development server
 
