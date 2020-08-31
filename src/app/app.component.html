@@ -1,30 +1,33 @@
 <div class="container text-center">
     <h1 style="margin-top: 20px">Weather Check</h1>
     <hr>
-    <div class="d-flex justify-content-center" style="margin-top: 40px">
+    <div class="d-flex justify-content-center" style="margin-top: 40px; margin-bottom: 20px">
         <div class="col-xs-8">
-            <input type="text" id="city" class="form-control" placeholder="Enter a city" #city>
+            <input type="text" id="city" class="form-control" placeholder="Enter a city" #city (keyup.enter)="onEnterKeyPress()">
         </div>
     </div>
-    <!-- <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center">
         <div 
-            *ngIf="isBtnClickedWithoutCity" 
+            *ngIf="isBtnClickedWithoutCity || hasError" 
             class="alert alert-danger alert-dismissible fade show" 
-            style="margin-top: 15px; width: 50%">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            Please enter a city.
+            id="alertMsg"
+            style="margin-top: 20px; width: 50%">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close" (click)="onDismiss()">&times;</a>
+            {{ errorText }}
         </div>
-    </div> -->
-    <div class="d-flex justify-content-center" style="margin-top: 40px">
-      <button *ngIf="!(spinner | async)" type="button" class="btn btn-info" id="maxTemp" (click)="onMaxTemp()" >Maximum Temperatur</button>
+    </div>
+    <div class="d-flex justify-content-center" style="margin-top: 30px">
+      <button type="button" class="btn btn-info" id="maxTemp" (click)="onMaxTemp()" >Maximum Temperature</button>
       <button type="button" class="btn btn-info" id="minTemp" (click)="onMinTemp()">Minimum Temperature</button>
       <button type="button" class="btn btn-info" id="medianTemp" (click)="onMedianTemp()">Median Temperature</button>
     </div>  
     <div *ngIf="spinner | async"><img src="/assets/45.gif" /></div>
-    <div class="d-flex justify-content-center" style="margin-top: 30px">
-        <input *ngIf="maxBtnClicked" type="text" id="valueMax" class="form-control"  value="{{maxTemp}}" style="width: 130px">
-        <input *ngIf="minBtnClicked" type="text" id="valueMin" class="form-control" value="{{minTemp}}" style="width: 130px">
-        <input *ngIf="medianBtnClicked" type="text" id="valueMedian" class="form-control" value="{{medianTemp}}" style="width: 130px">
+    <div class="d-flex justify-content-center" style="margin-top: 50px">
+        <div>
+            <h5 *ngIf="maxBtnClicked && !hasError && !isBtnClickedWithoutCity" name="tempInfoMax"> Maximum temperature in {{ city.value | uppercase }} over next 5 days will be  {{ maxTempInFah }} fahrenheit.</h5>
+            <h5 *ngIf="minBtnClicked && !hasError && !isBtnClickedWithoutCity" name="tempInfoMin"> Minimum temperature in {{ city.value | uppercase }} over next 5 days will be  {{ minTempInFah }} fahrenheit.</h5>
+            <h5 *ngIf="medianBtnClicked && !hasError && !isBtnClickedWithoutCity" name="tempInfoName"> Median temperature in {{ city.value | uppercase }} over next 5 days will be  {{ medianTempInFah }} fahrenheit.</h5>
+        </div>
     </div>
 
 </div>

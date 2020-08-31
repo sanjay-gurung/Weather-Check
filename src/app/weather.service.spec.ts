@@ -1,4 +1,4 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed, inject, async } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { WeatherService } from './weather.service';
 import { Temps } from './temps.model';
@@ -7,7 +7,18 @@ import { request } from 'http';
 describe('WeatherService', () => {
   let service: WeatherService;
   let httpMock: HttpTestingController;
-  let dummyCity: string = 'seattle'
+  let dummyCity: string = 'fakeCity'
+  let mockedTemps: Temps = { 
+    code: 200, 
+    list: [ 
+      { 
+        main : { 
+          temp_min: 32, 
+          temp_max: 115 
+        }
+      }
+    ]
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -18,24 +29,45 @@ describe('WeatherService', () => {
     });
     service = TestBed.inject(WeatherService);
     httpMock = TestBed.get(HttpTestingController);
+
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get temperatures when fetchMethod is called', () => {
-    inject([HttpTestingController, WeatherService],
-      (httpMock: HttpTestingController, service: WeatherService) => {
-
-        //calling the service
-        service.fetchWeather(dummyCity).subscribe(data => {
-          expect(data.code).toBe(200);
-        });
-
-        //setting the expectation for the Httpclient mock
-        const  request = httpMock.expectOne('http://dummyDomain/dummyUri/dummuQueryString');
-        expect(request.request.method).toEqual('GET');
-      })
+  it('should get expected temperatures when fetchWeather is called', async(() => {
+    service.fetchWeather(dummyCity).subscribe((response) => {
+      expect(response).toBe(mockedTemps, 'should match the returned mocked temperatures');
     })
+
+    const req = httpMock.expectOne(service.BASE_URL + dummyCity + service.API_KEY);
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(mockedTemps);
+  }))
+
+  it('should return expected error message when no city found', async(() => {
+    service.fetchWeather(dummyCity).subscribe((response) => {
+      expect(response.code).toEqual(404, 'should match the returned movked code');
+    })
+
+    const req = httpMock.expectOne(service.BASE_URL + dummyCity + service.API_KEY);
+    
+    const mockedErrorResponse = { code: 404, message: "city not found" };
+    req.flush(mockedErrorResponse);
+  
+  }))
+  
+  it('should be OK to reutn no list of temeratures', async(() => {
+    service.fetchWeather(dummyCity).subscribe((response) => {
+      expect(response.list.length).toEqual(0, 'should match the empty temperatures list');
+    })
+
+    const req = httpMock.expectOne(service.BASE_URL + dummyCity + service.API_KEY);
+    
+    const mockedErrorResponse = { list: [] };
+    req.flush(mockedErrorResponse);
+  
+  }))
 });

@@ -1,12 +1,15 @@
-export function reducer(state = { isOn: false }, action) {
+import * as Actions from './spinner.action';
+
+export function reducer(state = { isOn: false }, action: Actions.SpinnerActions) {
     switch (action.type) {
-      case 'startSpinner': {
+      // case 'startSpinner': {
+      case Actions.START_SPINNER: {
         return {
           isOn: true
         };
       }
-  
-      case 'stopSpinner': {
+      // case 'stopSpinner': {
+      case Actions.STOP_SPINNER: {
         return {
           isOn: false
         };

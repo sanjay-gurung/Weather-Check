@@ -1,8 +1,11 @@
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WeatherService } from './weather.service';
-import { Observable } from 'rxjs';
+import { StoreModule } from '@ngrx/store';
+import { reducer } from './state/spinner/spinner.reducer';
+import { Temps } from './temps.model';
+import { of } from 'rxjs';
 
 
 describe('AppComponent', () => {
@@ -11,10 +14,25 @@ describe('AppComponent', () => {
   let service: WeatherService;
   let mockBaseUri: any;
   let mockApiKey: any;
+  let testCity: string = "seattle";
+  let mockResponse: Temps = { 
+    code: 200, 
+    list: [ 
+      { 
+        main : { 
+          temp_min: 32, 
+          temp_max: 115 
+        }
+      }
+    ]
+  }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        StoreModule.forRoot({ spinner: reducer })
+      ],
       declarations: [ AppComponent ],
       providers: [ WeatherService ]
     }).compileComponents();
@@ -48,9 +66,45 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('h1').textContent).toContain('Weather Check');
   });
 
-  it('should call featchWeather method when process methos is called', () => {
-    spyOn(service, 'fetchWeather')
+  it('should call featchWeather method when process methos is called', async (() => {
+    const spy1 = spyOn(service, 'fetchWeather').and.returnValue(of(mockResponse));
+    const spy2 = spyOn(service.fetchWeather(testCity), 'subscribe');
     component.process();
-    expect(service.fetchWeather).toHaveBeenCalled();
-  })
-});
+    expect(spy1).toHaveBeenCalled();
+    expect(spy2).toHaveBeenCalled();
+  }))
+
+  it('should display alert when button clicked without city', async(() => {
+    const compiled = fixture.nativeElement;
+    component.onMaxTemp();
+    fixture.detectChanges();
+    const alert = compiled.querySelector("#alertMsg");
+    expect(alert).toBeTruthy();
+  }));
+
+  it('should display alert when invalid city entered', async(() => {
+    const compiled = fixture.nativeElement;
+    const inputBox = compiled.querySelector("input");
+    inputBox.label = "";
+    component.onMaxTemp();
+    fixture.detectChanges();
+    fixture.whenStable().then(() => {
+      const alert = compiled.querySelector("#alertMsg");
+      expect(alert).toBeTruthy();
+    })
+  }));
+
+  it('should display temperature info when a button is clicked and the city is found', async(() => {
+    const compiled = fixture.nativeElement;
+    const inputBox = compiled.querySelector("input");
+    inputBox.value = "las vegas";
+    component.onMaxTemp();
+    fixture.detectChanges();
+    fixture.whenStable().then(() => {
+      const tempInfo = compiled.querySelector("h5[name]");
+      expect(tempInfo).toBeTruthy();
+    })
+  }));
+
+
+})

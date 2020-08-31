@@ -16,5 +16,5 @@ export class EventComponent implements OnInit {
     this.spinner = this.store.pipe(select(state => state.spinner.isOn));
   }
 
-  }
+
 }
